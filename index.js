@@ -17,6 +17,11 @@ app.get("/api/courses", (req, res) => {
   res.send([1, 2, 3]);
 });
 
+// api/courses/1
+app.get("/api/courses/:id", (req, res) => {
+  res.send(req.params.id);
+});
+
 //PORT
 // port is dyanmically assigned by the hosting environment & we can't rely on 3000 to be available
 // PORT is an an environment variable(is the part of environment on which the process runs).
