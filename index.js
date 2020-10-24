@@ -27,13 +27,10 @@ app.get("/api/courses", (req, res) => {
 
 //http post request to create a new course
 app.post("/api/courses", (req, res) => {
-  const schema = Joi.object({
-    name: Joi.string().min(3).required(),
-  });
-  const result = schema.validate(req.body);
-  if (result.error) {
+  const { error } = validateCourse(req.body);
+  if (error) {
     // 400 bad request
-    res.status(400).send(result.error.details[0].message);
+    res.status(400).send(error.details[0].message);
     return;
   }
 
@@ -44,6 +41,31 @@ app.post("/api/courses", (req, res) => {
   };
   courses.push(course);
   // client always needs to know about the properties of the course
+  res.send(course);
+});
+
+app.put("/api/courses/:id", (req, res) => {
+  // find course
+  // if not existing return 404
+  const course = courses.find((c) => c.id === parseInt(req.params.id));
+  if (!course) {
+    // 404
+    res
+      .status(404)
+      .send(`The course with the given ID ${req.params.id} was not found`);
+  }
+
+  //validate
+  // if invalid return 400 - Bad request
+  const { error } = validateCourse(req.body);
+  if (error) {
+    // 400 bad request
+    res.status(400).send(error.details[0].message);
+    return;
+  }
+  //Update course
+  // Return the updated course
+  course.name = req.body.name;
   res.send(course);
 });
 
@@ -59,6 +81,13 @@ app.get("/api/courses/:id", (req, res) => {
     res.send(course);
   }
 });
+
+const validateCourse = (course) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).required(),
+  });
+  return schema.validate(course);
+};
 
 //PORT
 // port is dyanmically assigned by the hosting environment & we can't rely on 3000 to be available
