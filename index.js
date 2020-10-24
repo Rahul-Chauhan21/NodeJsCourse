@@ -1,5 +1,5 @@
+const Joi = require("joi");
 const express = require("express");
-
 const app = express(); //by convection this func returns an object called app
 
 // middleware
@@ -27,8 +27,19 @@ app.get("/api/courses", (req, res) => {
 
 //http post request to create a new course
 app.post("/api/courses", (req, res) => {
+  const schema = Joi.object({
+    name: Joi.string().min(3).required(),
+  });
+  const result = schema.validate(req.body);
+  if (result.error) {
+    // 400 bad request
+    res.status(400).send(result.error.details[0].message);
+    return;
+  }
+
   const course = {
     id: courses.length + 1,
+    //validate what client sends you
     name: req.body.name,
   };
   courses.push(course);
