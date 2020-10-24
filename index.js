@@ -2,6 +2,11 @@ const express = require("express");
 
 const app = express(); //by convection this func returns an object called app
 
+const courses = [
+  { id: 1, name: "course1" },
+  { id: 2, name: "course2" },
+  { id: 3, name: "course3" },
+];
 // app object has methods corresponding to the http methods
 
 // making a http get request at the end point '/'
@@ -14,12 +19,20 @@ app.get("/", (req, res) => {
 // app.delete();
 app.get("/api/courses", (req, res) => {
   //query a database irl
-  res.send([1, 2, 3]);
+  res.send(courses);
 });
 
 // api/courses/1
 app.get("/api/courses/:id", (req, res) => {
-  res.send(req.params.id);
+  const course = courses.find((c) => c.id === parseInt(req.params.id));
+  if (!course) {
+    // 404
+    res
+      .status(404)
+      .send(`The course with the given ID ${req.params.id} was not found`);
+  } else {
+    res.send(course);
+  }
 });
 
 //PORT
