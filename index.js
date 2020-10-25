@@ -1,9 +1,16 @@
 const Joi = require("joi");
+const logger = require("./logger");
+const authenticate = require("./authentication");
 const express = require("express");
 const app = express(); //by convection this func returns an object called app
 
 // middleware
-app.use(express.json());
+app.use(express.json()); //parse the body of request into a json object by setting/populating the request.body property
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static("public")); //served from the root
+
+app.use(logger);
+app.use(authenticate);
 
 const courses = [
   { id: 1, name: "course1" },
